@@ -18,6 +18,7 @@ from pytorch_classification import cifar
 import torch.utils.data as data
 
 #TODO: LR Decay
+#TODO: Controllare che la deep copy funzioni
 
 model_names = sorted(name for name in cifar_models.__dict__
     if name.islower() and not name.startswith("__")
@@ -252,20 +253,20 @@ def main():
     else:
         model = cifar_models.__dict__[args.arch](num_classes=num_classes)
 
-    models = [copy.deepcopy(model) for _ in range(3)]
+    learning_rates = [5e-4, 1e-3, 2e-3, 4e-3]
+
+    models = [copy.deepcopy(model) for _ in range(len(learning_rates) + 1)]
 
     start_epoch = 0
 
     criterion = nn.CrossEntropyLoss()
 
     optimizers = [
-        SplitOptimizer(models[0].parameters(), lrs=[1e-3, 2e-3], momentum=args.momentum, weight_decay=args.weight_decay),
-        optim.SGD(models[1].parameters(), lr=1e-3, momentum=args.momentum, weight_decay=args.weight_decay),
-        optim.SGD(models[2].parameters(), lr=2e-3, momentum=args.momentum, weight_decay=args.weight_decay)
+        SplitOptimizer(models[0].parameters(), lrs=learning_rates, momentum=args.momentum, weight_decay=args.weight_decay)
     ]
 
-    for model in models:
-        optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
+    for i, learning_rate in enumerate(learning_rates):
+        optimizer = optim.SGD(models[i + 1].parameters(), lr=learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
         optimizers.append(optimizer)
 
     use_cuda = False
@@ -280,7 +281,9 @@ def main():
             train_loss, train_acc = cifar.train(trainloader, model, i, criterion, optimizer, epoch, use_cuda)
             test_loss, test_acc = cifar.test(testloader, model, i, criterion, epoch, use_cuda)
 
-            print('Test accuracy for model {}: {}'.format(i + 1, test_acc))
+            name = type(model).__name__
+            print('Test accuracy for model {} ({}): {}'.format(i + 1, name, test_acc))
+        print('==========')
 
 def adjust_learning_rate(optimizer, epoch):
     if isinstance(optimizer, SGD):

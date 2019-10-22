@@ -265,7 +265,7 @@ def train(trainloader, model, model_index, criterion, optimizer, epoch, use_cuda
         batch_time.update(time.time() - end)
         end = time.time()
 
-        print('Train for model {}: {}/{}'.format(model_index + 1, batch_idx + 1, len(trainloader)))
+        # print('Train for model {}: {}/{}'.format(model_index + 1, batch_idx + 1, len(trainloader)))
 
     return (losses.avg, top1.avg)
 
@@ -304,7 +304,7 @@ def test(testloader, model, model_index, criterion, epoch, use_cuda):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        print('Test for model {}: {}/{}'.format(model_index + 1, batch_idx + 1, len(testloader)))
+        # print('Test for model {}: {}/{}'.format(model_index + 1, batch_idx + 1, len(testloader)))
     return (losses.avg, top1.avg)
 
 def save_checkpoint(state, is_best, checkpoint='checkpoint', filename='checkpoint.pth.tar'):

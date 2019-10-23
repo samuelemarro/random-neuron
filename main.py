@@ -257,6 +257,11 @@ def main():
 
     models = [copy.deepcopy(model) for _ in range(len(learning_rates) + 1)]
 
+    # Note: Really expensive, consider dynamic CUDA loading
+    if use_cuda:
+        for model in models:
+            model.cuda()
+
     start_epoch = 0
 
     criterion = nn.CrossEntropyLoss()

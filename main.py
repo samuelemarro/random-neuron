@@ -269,7 +269,7 @@ def main():
         optimizer = optim.SGD(models[i + 1].parameters(), lr=learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
         optimizers.append(optimizer)
 
-    use_cuda = False
+    print('CUDA: {}'.format(use_cuda))
 
     # Train and val
     for epoch in range(start_epoch, args.epochs):
